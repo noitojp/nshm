@@ -5,8 +5,15 @@ nshm
 build
 =============
 
+- need makecfg
 
 ::
   
   % cd src
-  % make
+  % mak
+
+
+copyright
+=============
+
+Nobutaka Ito all rights reserved.
