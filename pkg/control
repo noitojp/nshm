@@ -1,0 +1,21 @@
+Source: nshm
+Priority: optional
+Maintainer: Nobutaka Ito <noitojp@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.8.4
+Section: libs
+Homepage: no url
+
+Package: nshm-dev
+Section: libdevel
+Architecture: any
+Depends: nshm (= ${binary:Version})
+Description: noito's shared memory lib like libhash in Y.
+
+
+Package: nshm
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: noito's shared memory lib like libhash in Y.
+

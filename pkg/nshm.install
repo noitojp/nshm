@@ -1,0 +1,3 @@
+home/y/lib/lib*.so.*
+home/y/lib/lib*.so
+etc/ld.so.conf.d/*.conf
