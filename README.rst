@@ -10,7 +10,7 @@ build
 ::
   
   % cd src
-  % mak
+  % make
 
 
 copyright
