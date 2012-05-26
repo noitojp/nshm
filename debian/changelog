@@ -1,3 +1,9 @@
+nshm (0.0.2) unstable; urgency=low
+
+  * add nshm_set_replaced. 
+
+ -- noito <noito@think>  Sat, 26 May 2012 19:58:03 +0900
+
 nshm (0.0.1) unstable; urgency=low
 
   * Initial release.

@@ -39,6 +39,8 @@ extern int nshm_get_replaced(NShm *nshm);
 extern time_t nshm_get_ctime(NShm *nshm);
 extern int64_t nshm_get_restbyte(NShm *nshm);
 
+extern int nshm_set_replaced(NShm *nshm);
+
 #ifdef __cplusplus
 }
 #endif

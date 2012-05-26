@@ -414,6 +414,16 @@ int64_t nshm_get_restbyte(NShm *nshm)
 	return((int64_t)(nshm->_size - ((_nshm_base_t*)nshm->_base)->free_offset));
 }
 
+int nshm_set_replaced(NShm *nshm)
+{
+	if( NULL == nshm ){
+		return(-1);
+	}
+
+	(((_nshm_base_t*)nshm->_base)->replaced) = 1;
+	return(((_nshm_base_t*)nshm->_base)->replaced);
+}
+
 static void* _alloc_small_shmem(NShm *nshm,int32_t size)
 {
 	void *_nshm_base = NULL;
