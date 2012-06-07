@@ -1,3 +1,9 @@
+nshm (0.0.3) unstable; urgency=low
+
+  * change dir.
+
+ -- noito <noitojp@gmail.com>  Thu, 07 Jun 2012 16:06:52 +0900
+
 nshm (0.0.2) unstable; urgency=low
 
   * add nshm_set_replaced. 
