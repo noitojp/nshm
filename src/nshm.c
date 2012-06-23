@@ -108,26 +108,22 @@ NShm* nshm_create(const char *path,size_t size,mode_t mode)
 
 	nshm = (NShm*)malloc(sizeof(*nshm));
 	if( NULL == nshm ){
-		fprintf(stderr,"ERROR: malloc: %s\n",strerror(errno));
 		goto error;
 	}
 	_init_meta(nshm);
 
 	nshm->_fd = open(path,O_RDWR|O_CREAT|O_TRUNC,mode);
 	if( nshm->_fd < 0 ){
-		fprintf(stderr,"ERROR: open %s: %s\n",path,strerror(errno));
 		goto error;
 	}
 
 	if( ftruncate(nshm->_fd,(off_t)size) != 0 ){
-		fprintf(stderr,"ERROR: ftruncate %s: %s\n",path,strerror(errno));
 		goto error;
 	}
 	nshm->_size = (size_t)size;
 
 	nshm->_base = mmap(0,nshm->_size,PROT_READ|PROT_WRITE,MAP_SHARED,nshm->_fd,(off_t)0);
 	if( MAP_FAILED == nshm->_base ){
-		fprintf(stderr,"ERROR: mmap %s: %s\n",path,strerror(errno));
 		goto error;
 	}
 
@@ -137,7 +133,6 @@ NShm* nshm_create(const char *path,size_t size,mode_t mode)
 	base->replaced = 0;
 	base->ctime = time(NULL);
 	if( pthread_spin_init(&base->lock_point,PTHREAD_PROCESS_SHARED) != 0 ){
-		fprintf(stderr,"ERROR: pthread_spin_init %s: %s\n",path,strerror(errno));
 		goto error;
 	}
 	base->free_offset = (int64_t)sizeof(_nshm_base_t);
@@ -154,7 +149,6 @@ NShm* nshm_create(const char *path,size_t size,mode_t mode)
 		base->data[ix] = (int64_t)-1;
 	}
 
-	fprintf(stderr,"INFO: create v%d nshm: %s\n",base->version,path);
 	return(nshm);
 
  error:
@@ -174,41 +168,34 @@ NShm* nshm_attach(const char *path)
 
 	nshm = (NShm*)malloc(sizeof(*nshm));
 	if( NULL == nshm ){
-		fprintf(stderr,"ERROR: malloc: %s\n",strerror(errno));
 		goto error;
 	}
 
 	_init_meta(nshm);
 	nshm->_fd = open(path,O_RDWR);
 	if( nshm->_fd < 0 ){
-		fprintf(stderr,"ERROR: open %s: %s\n",path,strerror(errno));
 		goto error;
 	}
 
 	if( fstat(nshm->_fd,&st) < 0 ){
-		fprintf(stderr,"ERROR: fstat %s: %s\n",path,strerror(errno));
 		goto error;
 	}
 
 	nshm->_size = (size_t)st.st_size;
 	nshm->_base = mmap(0,nshm->_size,PROT_READ|PROT_WRITE,MAP_SHARED,nshm->_fd,(off_t)0);
 	if( MAP_FAILED == nshm->_base ){
-		fprintf(stderr,"ERROR: mmap %s: %s\n",path,strerror(errno));
 		goto error;
 	}
 
 	base = (_nshm_base_t*)nshm->_base;
 	if( strncmp(base->magic,_MAGIC,strlen(_MAGIC)) != 0 ){
-		fprintf(stderr,"ERROR: %s isn't nshm\n",path);
 		goto error;
 	}
 
 	if( base->version != _NOW_VERSION ){
-		fprintf(stderr,"ERROR: %s isn't supported(v%d)\n",path,base->version);
 		goto error;
 	}
 
-	fprintf(stderr,"INFO: attach v%d nshm: %s\n",base->version,path);
 	return(nshm);
 
  error:
@@ -233,7 +220,7 @@ void nshm_detach(NShm *nshm)
 
 	_init_meta(nshm);
 	free(nshm);
-	fprintf(stderr,"INFO: detach nshm\n");
+	return;
 }
 
 NShm* nshm_reattach(const char *path,NShm *nshm)
@@ -523,6 +510,7 @@ static void _free_small_shmem(NShm *nshm,_shmem_hdr *hdr)
 	hdr->next_offset = base->small_msegs[index];
 	base->small_msegs[index] = vos_assign(int64_t,hdr);
 	_unlock_nshm(nshm);
+	return;
 }
 
 static void _free_big_shmem(NShm *nshm,_shmem_hdr *hdr)
@@ -538,6 +526,7 @@ static void _free_big_shmem(NShm *nshm,_shmem_hdr *hdr)
 	hdr->next_offset = base->big_msegs[index];
 	base->big_msegs[index] = vos_assign(int64_t,hdr);
 	_unlock_nshm(nshm);
+	return;
 }
 
 static void* _shmalloc(NShm *nshm,int32_t size)
@@ -566,6 +555,7 @@ static void _init_meta(NShm *nshm)
 	nshm->_base = MAP_FAILED;
 	sigfillset(&nshm->_full_set);
 	sigemptyset(&nshm->_backup_set);
+	return;
 }
 
 static void _lock_nshm(NShm *nshm)
@@ -573,6 +563,7 @@ static void _lock_nshm(NShm *nshm)
 	_nshm_base_t *base = (_nshm_base_t*)nshm->_base;
 	pthread_sigmask(SIG_BLOCK,&nshm->_full_set,&nshm->_backup_set);
 	pthread_spin_lock(&base->lock_point);
+	return;
 }
 
 static void _unlock_nshm(NShm *nshm)
@@ -580,6 +571,7 @@ static void _unlock_nshm(NShm *nshm)
 	_nshm_base_t *base = (_nshm_base_t*)nshm->_base;
 	pthread_spin_unlock(&base->lock_point);
 	pthread_sigmask(SIG_SETMASK,&nshm->_backup_set,NULL);
+	return;
 }
 
 static int _get_key_hash(const char *key,int klen)
